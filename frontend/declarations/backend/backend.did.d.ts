@@ -4,9 +4,12 @@ import type { IDL } from '@dfinity/candid';
 
 export interface GuideSection { 'title' : string, 'content' : string }
 export interface Talent {
+  'id' : string,
+  'row' : bigint,
   'name' : string,
   'recommended' : boolean,
   'description' : string,
+  'column' : bigint,
 }
 export interface TalentTree { 'talents' : Array<Talent>, 'name' : string }
 export interface _SERVICE {

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Card, CardContent, CircularProgress, Accordion, AccordionSummary, AccordionDetails, Chip } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Typography, CircularProgress, Tooltip } from '@mui/material';
 import { backend } from '../../declarations/backend';
+import { Scatter } from 'react-chartjs-2';
+import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip as ChartTooltip } from 'chart.js';
+
+ChartJS.register(LinearScale, PointElement, LineElement, ChartTooltip);
 
 interface Talent {
+  id: string;
   name: string;
   description: string;
   recommended: boolean;
+  row: number;
+  column: number;
 }
 
 interface TalentTree {
@@ -37,33 +43,72 @@ const TalentsPage = () => {
     return <CircularProgress />;
   }
 
+  const talentTree = talentTrees[0]; // Assuming we're only displaying one tree
+
+  const chartData = {
+    datasets: [
+      {
+        label: 'Talents',
+        data: talentTree.talents.map((talent) => ({
+          x: talent.column,
+          y: -talent.row, // Negative to invert the y-axis
+          talent: talent,
+        })),
+        backgroundColor: talentTree.talents.map((talent) =>
+          talent.recommended ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)'
+        ),
+        pointRadius: 20,
+        pointHoverRadius: 25,
+      },
+    ],
+  };
+
+  const options = {
+    scales: {
+      x: {
+        type: 'linear' as const,
+        position: 'bottom' as const,
+        min: -1,
+        max: 3,
+        ticks: {
+          display: false,
+        },
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        type: 'linear' as const,
+        min: -6,
+        max: 1,
+        ticks: {
+          display: false,
+        },
+        grid: {
+          display: false,
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const talent = context.raw.talent;
+            return [`${talent.name}`, `${talent.description}`, talent.recommended ? 'Recommended' : ''];
+          },
+        },
+      },
+    },
+  };
+
   return (
     <div>
       <Typography variant="h4" gutterBottom>
-        Brewmaster Monk Talents
+        {talentTree.name}
       </Typography>
-      {talentTrees.map((tree, index) => (
-        <Accordion key={index}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">{tree.name}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            {tree.talents.map((talent, talentIndex) => (
-              <Card key={talentIndex} sx={{ mb: 2 }}>
-                <CardContent>
-                  <Typography variant="h6">
-                    {talent.name}
-                    {talent.recommended && (
-                      <Chip label="Recommended" color="primary" size="small" sx={{ ml: 1 }} />
-                    )}
-                  </Typography>
-                  <Typography variant="body1">{talent.description}</Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </AccordionDetails>
-        </Accordion>
-      ))}
+      <div style={{ width: '100%', height: '600px' }}>
+        <Scatter data={chartData} options={options} />
+      </div>
     </div>
   );
 };

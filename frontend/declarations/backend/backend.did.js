@@ -1,9 +1,12 @@
 export const idlFactory = ({ IDL }) => {
   const GuideSection = IDL.Record({ 'title' : IDL.Text, 'content' : IDL.Text });
   const Talent = IDL.Record({
+    'id' : IDL.Text,
+    'row' : IDL.Nat,
     'name' : IDL.Text,
     'recommended' : IDL.Bool,
     'description' : IDL.Text,
+    'column' : IDL.Nat,
   });
   const TalentTree = IDL.Record({
     'talents' : IDL.Vec(Talent),

@@ -5,9 +5,12 @@ type TalentTree =
  };
 type Talent = 
  record {
+   column: nat;
    description: text;
+   id: text;
    name: text;
    recommended: bool;
+   row: nat;
  };
 type GuideSection = 
  record {
