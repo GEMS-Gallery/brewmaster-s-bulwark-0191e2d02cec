@@ -1,7 +1,13 @@
 type TalentTree = 
  record {
    name: text;
-   talents: vec GuideSection;
+   talents: vec Talent;
+ };
+type Talent = 
+ record {
+   description: text;
+   name: text;
+   recommended: bool;
  };
 type GuideSection = 
  record {
@@ -12,5 +18,5 @@ service : {
   getCooldowns: () -> (vec GuideSection) query;
   getRotation: () -> (vec GuideSection) query;
   getStatPriority: () -> (vec GuideSection) query;
-  getTalentPoints: () -> (vec TalentTree) query;
+  getTalentTrees: () -> (vec TalentTree) query;
 }

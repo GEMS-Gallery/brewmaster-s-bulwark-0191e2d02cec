@@ -1,27 +1,36 @@
+import Bool "mo:base/Bool";
+import Char "mo:base/Char";
 import Nat "mo:base/Nat";
+import Order "mo:base/Order";
 
 import Text "mo:base/Text";
 import Array "mo:base/Array";
 import Option "mo:base/Option";
 
 actor {
+  type Talent = {
+    name: Text;
+    description: Text;
+    recommended: Bool;
+  };
+
+  type TalentTree = {
+    name: Text;
+    talents: [Talent];
+  };
+
   type GuideSection = {
     title: Text;
     content: Text;
   };
 
-  type TalentTree = {
-    name: Text;
-    talents: [GuideSection];
-  };
-
-  stable var talentPoints: ?[TalentTree] = null;
+  stable var talentTrees: ?[TalentTree] = null;
   stable var statPriority: ?[GuideSection] = null;
   stable var rotation: ?[GuideSection] = null;
   stable var cooldowns: ?[GuideSection] = null;
 
-  public query func getTalentPoints(): async [TalentTree] {
-    Option.get(talentPoints, [])
+  public query func getTalentTrees(): async [TalentTree] {
+    Option.get(talentTrees, [])
   };
 
   public query func getStatPriority(): async [GuideSection] {
@@ -38,29 +47,35 @@ actor {
 
   // Initialize guide data
   func initGuideData() {
-    talentPoints := ?[
+    talentTrees := ?[
       {
-        name = "Monk";
+        name = "Class Talents";
         talents = [
-          { title = "Chi Burst"; content = "Hurls a torrent of Chi energy up to 40 yds forward, dealing (30% of Attack power) Nature damage to all enemies, and (30% of Attack power) healing to the Monk and all allies in its path. Generates 1 Chi per enemy hit, up to 2 Chi." },
-          { title = "Eye of the Tiger"; content = "Tiger Palm also applies Eye of the Tiger, dealing (4.5% of Attack power) Nature damage to the enemy and (4.5% of Attack power) healing to you over 8 sec." },
-          { title = "Chi Wave"; content = "A wave of Chi energy flows through friends and foes, dealing (20% of Attack power) Nature damage or (20% of Attack power) healing. Bounces up to 7 times to targets within 25 yards." }
+          { name = "Eye of the Tiger"; description = "Tiger Palm also applies Eye of the Tiger, dealing Nature damage to the enemy and healing you over 8 sec."; recommended = true },
+          { name = "Chi Wave"; description = "A wave of Chi energy flows through friends and foes, dealing Nature damage or healing."; recommended = false },
+          { name = "Chi Burst"; description = "Hurls a torrent of Chi energy up to 40 yds forward, dealing Nature damage to all enemies, and healing you and all allies in its path."; recommended = false },
+          { name = "Celerity"; description = "Reduces the cooldown of Roll by 5 sec and increases its maximum charges by 1."; recommended = true },
+          { name = "Tiger's Lust"; description = "Increases a friendly target's movement speed by 70% for 6 sec and removes all roots and snares."; recommended = false },
+          { name = "Summon White Tiger Statue"; description = "Summons a White Tiger Statue at the target location for 30 sec, pulsing every 2 sec, healing up to 3 allies within 10 yds for (40% of Spell power)."; recommended = true }
         ];
       },
       {
-        name = "Brewmaster";
+        name = "Specialization Talents";
         talents = [
-          { title = "Celestial Flames"; content = "Keg Smash reduces the remaining cooldown on your Brews by 1 additional sec." },
-          { title = "Improved Purifying Brew"; content = "Purifying Brew now has 2 charges." },
-          { title = "Stagger"; content = "You shrug off attacks, delaying a portion of Physical damage based on your Agility, instead taking it over 10 sec." }
+          { name = "Celestial Flames"; description = "Keg Smash reduces the remaining cooldown on your Brews by 1 additional sec."; recommended = true },
+          { name = "Improved Purifying Brew"; description = "Purifying Brew now has 2 charges."; recommended = true },
+          { name = "Improved Celestial Brew"; description = "Celestial Brew's barrier now absorbs at least 25% of your maximum health in damage."; recommended = true },
+          { name = "Shuffle"; description = "Your Stagger now reduces 10% more damage."; recommended = true },
+          { name = "Evasive Stride"; description = "You heal for 20% of your Staggered damage when you move."; recommended = true },
+          { name = "Exploding Keg"; description = "Hurls a flaming keg at the target location, dealing Fire damage to nearby enemies and causing them to miss their melee attacks for 3 sec."; recommended = false }
         ];
       },
       {
-        name = "Hero";
+        name = "Capstone Talents";
         talents = [
-          { title = "Diffuse Magic"; content = "Reduces magic damage you take by 60% for 6 sec, and transfers all currently active harmful magical effects on you back to their original caster if possible." },
-          { title = "Dampen Harm"; content = "Reduces all damage you take by 20% to 50% for 10 sec, with larger attacks being reduced by more." },
-          { title = "Summon Black Ox Statue"; content = "Summons a Black Ox Statue at the target location for 15 min, pulsing threat to all enemies within 20 yards. You may cast Provoke on the statue to taunt all enemies near the statue." }
+          { name = "Weapons of Order"; description = "For 30 sec, your Mastery is increased by 10%, Keg Smash cooldown is reset instantly and its damage is increased by 50%."; recommended = true },
+          { name = "Invoke Niuzao, the Black Ox"; description = "Summons an effigy of Niuzao for 25 sec. Niuzao attacks your primary target and taunts it. When you Stagger damage, 25% of the amount Staggered is instead dealt to enemies near Niuzao."; recommended = false },
+          { name = "Charred Passions"; description = "Breath of Fire ignites the ground for 6 sec, dealing additional periodic Fire damage to enemies who stand within it."; recommended = true }
         ];
       }
     ];
