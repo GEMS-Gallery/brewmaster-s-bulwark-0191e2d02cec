@@ -3,20 +3,20 @@ import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
 export interface GuideSection { 'title' : string, 'content' : string }
-export interface Talent {
-  'id' : string,
-  'row' : bigint,
+export interface TalentBuild {
+  'treeLink' : string,
   'name' : string,
-  'recommended' : boolean,
   'description' : string,
-  'column' : bigint,
 }
-export interface TalentTree { 'talents' : Array<Talent>, 'name' : string }
+export interface TalentSection {
+  'title' : string,
+  'builds' : Array<TalentBuild>,
+}
 export interface _SERVICE {
   'getCooldowns' : ActorMethod<[], Array<GuideSection>>,
   'getRotation' : ActorMethod<[], Array<GuideSection>>,
   'getStatPriority' : ActorMethod<[], Array<GuideSection>>,
-  'getTalentTrees' : ActorMethod<[], Array<TalentTree>>,
+  'getTalentSections' : ActorMethod<[], Array<TalentSection>>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

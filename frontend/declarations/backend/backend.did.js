@@ -1,22 +1,19 @@
 export const idlFactory = ({ IDL }) => {
   const GuideSection = IDL.Record({ 'title' : IDL.Text, 'content' : IDL.Text });
-  const Talent = IDL.Record({
-    'id' : IDL.Text,
-    'row' : IDL.Nat,
+  const TalentBuild = IDL.Record({
+    'treeLink' : IDL.Text,
     'name' : IDL.Text,
-    'recommended' : IDL.Bool,
     'description' : IDL.Text,
-    'column' : IDL.Nat,
   });
-  const TalentTree = IDL.Record({
-    'talents' : IDL.Vec(Talent),
-    'name' : IDL.Text,
+  const TalentSection = IDL.Record({
+    'title' : IDL.Text,
+    'builds' : IDL.Vec(TalentBuild),
   });
   return IDL.Service({
     'getCooldowns' : IDL.Func([], [IDL.Vec(GuideSection)], ['query']),
     'getRotation' : IDL.Func([], [IDL.Vec(GuideSection)], ['query']),
     'getStatPriority' : IDL.Func([], [IDL.Vec(GuideSection)], ['query']),
-    'getTalentTrees' : IDL.Func([], [IDL.Vec(TalentTree)], ['query']),
+    'getTalentSections' : IDL.Func([], [IDL.Vec(TalentSection)], ['query']),
   });
 };
 export const init = ({ IDL }) => { return []; };

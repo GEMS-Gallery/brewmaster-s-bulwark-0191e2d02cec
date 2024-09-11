@@ -1,45 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, CircularProgress, Tooltip, Box } from '@mui/material';
+import { Typography, CircularProgress, Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { backend } from '../../declarations/backend';
-import { Scatter } from 'react-chartjs-2';
-import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip as ChartTooltip } from 'chart.js';
 
-ChartJS.register(LinearScale, PointElement, LineElement, ChartTooltip);
-
-interface Talent {
-  id: string;
+interface TalentBuild {
   name: string;
   description: string;
-  recommended: boolean;
-  row: number;
-  column: number;
+  treeLink: string;
 }
 
-interface TalentTree {
-  name: string;
-  talents: Talent[];
+interface TalentSection {
+  title: string;
+  builds: TalentBuild[];
 }
 
 const TalentsPage = () => {
-  const [talentTrees, setTalentTrees] = useState<TalentTree[]>([]);
+  const [talentSections, setTalentSections] = useState<TalentSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTalentTrees = async () => {
+    const fetchTalentSections = async () => {
       try {
-        const result = await backend.getTalentTrees();
-        console.log('Fetched talent trees:', result);
-        setTalentTrees(result);
+        const result = await backend.getTalentSections();
+        console.log('Fetched talent sections:', result);
+        setTalentSections(result);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching talent trees:', error);
+        console.error('Error fetching talent sections:', error);
         setError('Failed to load talent data. Please try again later.');
         setLoading(false);
       }
     };
 
-    fetchTalentTrees();
+    fetchTalentSections();
   }, []);
 
   if (loading) {
@@ -54,79 +48,35 @@ const TalentsPage = () => {
     );
   }
 
-  if (talentTrees.length === 0) {
-    return (
-      <Typography variant="h6">
-        No talent data available.
-      </Typography>
-    );
-  }
-
-  const talentTree = talentTrees[0]; // Assuming we're only displaying one tree
-
-  const chartData = {
-    datasets: [
-      {
-        label: 'Talents',
-        data: talentTree.talents.map((talent) => ({
-          x: talent.column,
-          y: -talent.row, // Negative to invert the y-axis
-          talent: talent,
-        })),
-        backgroundColor: talentTree.talents.map((talent) =>
-          talent.recommended ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)'
-        ),
-        pointRadius: 20,
-        pointHoverRadius: 25,
-      },
-    ],
-  };
-
-  const options = {
-    scales: {
-      x: {
-        type: 'linear' as const,
-        position: 'bottom' as const,
-        min: -1,
-        max: 3,
-        ticks: {
-          display: false,
-        },
-        grid: {
-          display: false,
-        },
-      },
-      y: {
-        type: 'linear' as const,
-        min: -6,
-        max: 1,
-        ticks: {
-          display: false,
-        },
-        grid: {
-          display: false,
-        },
-      },
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: (context: any) => {
-            const talent = context.raw.talent;
-            return [`${talent.name}`, `${talent.description}`, talent.recommended ? 'Recommended' : ''];
-          },
-        },
-      },
-    },
-  };
-
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        {talentTree.name}
+        Talent Builds
       </Typography>
-      <Box sx={{ width: '100%', height: '600px', border: '1px solid #ccc' }}>
-        <Scatter data={chartData} options={options} />
+      {talentSections.map((section, index) => (
+        <Accordion key={index}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6">{section.title}</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {section.builds.map((build, buildIndex) => (
+              <Box key={buildIndex} mb={2}>
+                <Typography variant="h6">{build.name}</Typography>
+                <Typography variant="body1">{build.description}</Typography>
+                <Box mt={2}>
+                  <a href={build.treeLink} target="_blank" rel="noopener noreferrer" data-wowhead="talent-calc">
+                    View Talent Tree
+                  </a>
+                </Box>
+              </Box>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+      ))}
+      <Box mt={2}>
+        <Typography variant="caption">
+          Talent trees provided by Wowhead. Click on the links to view interactive talent calculators.
+        </Typography>
       </Box>
     </Box>
   );

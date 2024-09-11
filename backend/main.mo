@@ -1,23 +1,17 @@
-import Bool "mo:base/Bool";
-import Nat "mo:base/Nat";
-
 import Text "mo:base/Text";
 import Array "mo:base/Array";
 import Option "mo:base/Option";
 
 actor {
-  type Talent = {
-    id: Text;
+  type TalentBuild = {
     name: Text;
     description: Text;
-    recommended: Bool;
-    row: Nat;
-    column: Nat;
+    treeLink: Text;
   };
 
-  type TalentTree = {
-    name: Text;
-    talents: [Talent];
+  type TalentSection = {
+    title: Text;
+    builds: [TalentBuild];
   };
 
   type GuideSection = {
@@ -25,13 +19,13 @@ actor {
     content: Text;
   };
 
-  stable var talentTrees: ?[TalentTree] = null;
+  stable var talentSections: ?[TalentSection] = null;
   stable var statPriority: ?[GuideSection] = null;
   stable var rotation: ?[GuideSection] = null;
   stable var cooldowns: ?[GuideSection] = null;
 
-  public query func getTalentTrees(): async [TalentTree] {
-    Option.get(talentTrees, [])
+  public query func getTalentSections(): async [TalentSection] {
+    Option.get(talentSections, [])
   };
 
   public query func getStatPriority(): async [GuideSection] {
@@ -48,19 +42,35 @@ actor {
 
   // Initialize guide data
   func initGuideData() {
-    talentTrees := ?[
+    talentSections := ?[
       {
-        name = "Monk Hero Talents";
-        talents = [
-          { id = "1"; name = "Strength of Spirit"; description = "Increases your Stamina by 5%."; recommended = true; row = 0; column = 1 },
-          { id = "2"; name = "Resonant Fists"; description = "Your abilities have a chance to resonate with Shaohao's teachings, dealing additional Nature damage."; recommended = true; row = 1; column = 0 },
-          { id = "3"; name = "Calming Presence"; description = "Reduces damage taken by nearby allies by 3%."; recommended = false; row = 1; column = 2 },
-          { id = "4"; name = "Close to Heart"; description = "Increases your maximum health by 5%."; recommended = true; row = 2; column = 1 },
-          { id = "5"; name = "Graceful Exit"; description = "Roll and Chi Torpedo have 1 additional charge."; recommended = true; row = 3; column = 0 },
-          { id = "6"; name = "Vigorous Expulsion"; description = "Expel Harm's healing is increased by 20%."; recommended = false; row = 3; column = 2 },
-          { id = "7"; name = "Profound Rebuttal"; description = "Increases your Parry chance by 3%."; recommended = true; row = 4; column = 1 },
-          { id = "8"; name = "Improved Vivify"; description = "Vivify healing increased by 15%."; recommended = false; row = 5; column = 0 },
-          { id = "9"; name = "Improved Detox"; description = "Detox now removes an additional harmful effect."; recommended = true; row = 5; column = 2 }
+        title = "Monk Talents";
+        builds = [
+          {
+            name = "Standard Monk Build";
+            description = "A versatile build suitable for most content.";
+            treeLink = "https://www.wowhead.com/classic/talent-calc/monk/...";
+          }
+        ];
+      },
+      {
+        title = "Brewmaster Talents";
+        builds = [
+          {
+            name = "Defensive Brewmaster";
+            description = "Focuses on survivability and damage mitigation.";
+            treeLink = "https://www.wowhead.com/classic/talent-calc/monk/brewmaster/...";
+          }
+        ];
+      },
+      {
+        title = "Hero Talents";
+        builds = [
+          {
+            name = "Balanced Hero Build";
+            description = "A well-rounded build for various situations.";
+            treeLink = "https://www.wowhead.com/classic/talent-calc/monk/hero/...";
+          }
         ];
       }
     ];
