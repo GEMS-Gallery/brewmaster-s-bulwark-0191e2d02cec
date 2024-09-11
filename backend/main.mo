@@ -1,3 +1,5 @@
+import Nat "mo:base/Nat";
+
 import Text "mo:base/Text";
 import Array "mo:base/Array";
 import Option "mo:base/Option";
@@ -8,12 +10,17 @@ actor {
     content: Text;
   };
 
-  stable var talentPoints: ?[GuideSection] = null;
+  type TalentTree = {
+    name: Text;
+    talents: [GuideSection];
+  };
+
+  stable var talentPoints: ?[TalentTree] = null;
   stable var statPriority: ?[GuideSection] = null;
   stable var rotation: ?[GuideSection] = null;
   stable var cooldowns: ?[GuideSection] = null;
 
-  public query func getTalentPoints(): async [GuideSection] {
+  public query func getTalentPoints(): async [TalentTree] {
     Option.get(talentPoints, [])
   };
 
@@ -32,9 +39,30 @@ actor {
   // Initialize guide data
   func initGuideData() {
     talentPoints := ?[
-      { title = "Tier 15"; content = "Choose 'Eye of the Tiger' for consistent damage and healing." },
-      { title = "Tier 25"; content = "'Chi Torpedo' is great for mobility in dungeons." },
-      { title = "Tier 35"; content = "'Light Brewing' reduces the cooldown of your Brews." }
+      {
+        name = "Monk";
+        talents = [
+          { title = "Chi Burst"; content = "Hurls a torrent of Chi energy up to 40 yds forward, dealing (30% of Attack power) Nature damage to all enemies, and (30% of Attack power) healing to the Monk and all allies in its path. Generates 1 Chi per enemy hit, up to 2 Chi." },
+          { title = "Eye of the Tiger"; content = "Tiger Palm also applies Eye of the Tiger, dealing (4.5% of Attack power) Nature damage to the enemy and (4.5% of Attack power) healing to you over 8 sec." },
+          { title = "Chi Wave"; content = "A wave of Chi energy flows through friends and foes, dealing (20% of Attack power) Nature damage or (20% of Attack power) healing. Bounces up to 7 times to targets within 25 yards." }
+        ];
+      },
+      {
+        name = "Brewmaster";
+        talents = [
+          { title = "Celestial Flames"; content = "Keg Smash reduces the remaining cooldown on your Brews by 1 additional sec." },
+          { title = "Improved Purifying Brew"; content = "Purifying Brew now has 2 charges." },
+          { title = "Stagger"; content = "You shrug off attacks, delaying a portion of Physical damage based on your Agility, instead taking it over 10 sec." }
+        ];
+      },
+      {
+        name = "Hero";
+        talents = [
+          { title = "Diffuse Magic"; content = "Reduces magic damage you take by 60% for 6 sec, and transfers all currently active harmful magical effects on you back to their original caster if possible." },
+          { title = "Dampen Harm"; content = "Reduces all damage you take by 20% to 50% for 10 sec, with larger attacks being reduced by more." },
+          { title = "Summon Black Ox Statue"; content = "Summons a Black Ox Statue at the target location for 15 min, pulsing threat to all enemies within 20 yards. You may cast Provoke on the statue to taunt all enemies near the statue." }
+        ];
+      }
     ];
 
     statPriority := ?[
