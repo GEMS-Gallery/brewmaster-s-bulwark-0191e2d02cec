@@ -1,0 +1,11 @@
+type GuideSection = 
+ record {
+   content: text;
+   title: text;
+ };
+service : {
+  getCooldowns: () -> (vec GuideSection) query;
+  getRotation: () -> (vec GuideSection) query;
+  getStatPriority: () -> (vec GuideSection) query;
+  getTalentPoints: () -> (vec GuideSection) query;
+}
