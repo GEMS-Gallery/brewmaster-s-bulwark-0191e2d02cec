@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, CircularProgress, Tooltip } from '@mui/material';
+import { Typography, CircularProgress, Tooltip, Box } from '@mui/material';
 import { backend } from '../../declarations/backend';
 import { Scatter } from 'react-chartjs-2';
 import { Chart as ChartJS, LinearScale, PointElement, LineElement, Tooltip as ChartTooltip } from 'chart.js';
@@ -23,15 +23,18 @@ interface TalentTree {
 const TalentsPage = () => {
   const [talentTrees, setTalentTrees] = useState<TalentTree[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTalentTrees = async () => {
       try {
         const result = await backend.getTalentTrees();
+        console.log('Fetched talent trees:', result);
         setTalentTrees(result);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching talent trees:', error);
+        setError('Failed to load talent data. Please try again later.');
         setLoading(false);
       }
     };
@@ -41,6 +44,22 @@ const TalentsPage = () => {
 
   if (loading) {
     return <CircularProgress />;
+  }
+
+  if (error) {
+    return (
+      <Typography color="error" variant="h6">
+        {error}
+      </Typography>
+    );
+  }
+
+  if (talentTrees.length === 0) {
+    return (
+      <Typography variant="h6">
+        No talent data available.
+      </Typography>
+    );
   }
 
   const talentTree = talentTrees[0]; // Assuming we're only displaying one tree
@@ -102,14 +121,14 @@ const TalentsPage = () => {
   };
 
   return (
-    <div>
+    <Box>
       <Typography variant="h4" gutterBottom>
         {talentTree.name}
       </Typography>
-      <div style={{ width: '100%', height: '600px' }}>
+      <Box sx={{ width: '100%', height: '600px', border: '1px solid #ccc' }}>
         <Scatter data={chartData} options={options} />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
